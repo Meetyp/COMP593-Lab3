@@ -73,11 +73,27 @@ def process_sales_data(sales_csv, orders_dir):
         order_file_name = f'Order{order_id}_{customer_name}.xlsx'
         order_file_path = os.path.join(orders_dir, order_file_name)
 
+        # Get access to worksheet object
+        writer = pd.ExcelWriter(order_file_path, engine='xlsxwriter')
+
         # Export the data to an Excel sheet
         sheet_name = f'Order {order_id}'
-        order_df.to_excel(order_file_path, index=False, sheet_name=sheet_name)
+        order_df.to_excel(writer, index=False, sheet_name=sheet_name)
 
-        # TODO: Format the Excel sheet
+        workbook = writer.book
+        worksheet = writer.sheets[sheet_name]
+
+        # Add a number format for price cell
+        format_money = workbook.add_format({'num_format': '$#,##0.00'})
+
+        # Adjust the column width and format
+        worksheet.set_column('F:G', 12, format_money)
+        worksheet.set_column('A:C', 12)
+        worksheet.set_column('D:E', 13)
+        worksheet.set_column('H:H', 8)
+        worksheet.set_column('I:I', 26)
+
+        writer.close()
 
 if __name__ == '__main__':
     main()
